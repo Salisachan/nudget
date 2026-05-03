@@ -44,6 +44,7 @@ router.post('/parse', auth, async (req, res) => {
             amount: parsed.amount,
             category: parsed.category,
             description: parsed.description,
+            input: input,
         });
 
         await transaction.save();
