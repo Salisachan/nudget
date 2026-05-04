@@ -3,9 +3,10 @@ import { useAuth } from './context/AuthContext'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Register from './pages/Register'
+import Chat from './pages/Chat'
 import Dashboard from './pages/Dashboard'
-import EditTransaction from './pages/EditTransaction'
 import Transactions from './pages/Transactions'
+import EditTransaction from './pages/EditTransaction'
 
 const ProtectedRoute = ({ children }) => {
   const { token } = useAuth()
@@ -19,6 +20,11 @@ function App() {
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/chat" element={
+          <ProtectedRoute>
+            <Chat />
+          </ProtectedRoute>
+        } />
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
