@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
 import api from '../api'
 import TransactionCard from '../components/TransactionCard'
 import Navbar from '../components/Navbar'
+import useTransactions from '../hooks/useTransactions'
 
 function Chat() {
     const [input, setInput] = useState('')
     const [messages, setMessages] = useState([])
     const [loading, setLoading] = useState(false)
     const bottomRef = useRef(null)
-    const navigate = useNavigate()
+    const { addTransaction, removeTransaction } = useTransactions()
 
     // fetch last 10 transactions on load
     useEffect(() => {
@@ -33,7 +33,6 @@ function Chat() {
     const handleSend = async () => {
         if (!input.trim()) return
 
-        // add user bubble immediately
         const userMessage = { type: 'user', text: input }
         setMessages(prev => [...prev, userMessage])
         setInput('')
@@ -41,7 +40,9 @@ function Chat() {
 
         try {
             const res = await api.post('/transactions/parse', { input })
-            const cardMessage = { type: 'card', transaction: res.data.transaction }
+            const transaction = res.data.transaction
+            addTransaction(transaction)
+            const cardMessage = { type: 'card', transaction }
             setMessages(prev => [...prev, cardMessage])
         } catch (err) {
             const errorMessage = { type: 'error', text: 'Could not parse transaction. Please try again.' }
@@ -49,6 +50,11 @@ function Chat() {
         } finally {
             setLoading(false)
         }
+    }
+
+    const handleDelete = (id) => {
+        removeTransaction(id)
+        setMessages(prev => prev.filter(msg => msg.transaction?._id !== id))
     }
 
     const handleKeyDown = (e) => {
@@ -67,7 +73,10 @@ function Chat() {
                             </div>
                         )}
                         {msg.type === 'card' && (
-                            <TransactionCard transaction={msg.transaction} />
+                            <TransactionCard
+                                transaction={msg.transaction}
+                                onDelete={handleDelete}
+                            />
                         )}
                         {msg.type === 'error' && (
                             <div>

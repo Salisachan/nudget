@@ -68,7 +68,42 @@ router.get('/', auth, async (req, res) => {
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 });
+// Get monthly summary
+router.get('/summary', auth, async (req, res) => {
+    try {
+        const now = new Date()
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
 
+        const transactions = await Transaction.find({
+            userId: req.userId,
+            date: { $gte: startOfMonth }
+        })
+
+        const income = transactions
+            .filter(t => t.type === 'income')
+            .reduce((sum, t) => sum + t.amount, 0)
+
+        const expenses = transactions
+            .filter(t => t.type === 'expense')
+            .reduce((sum, t) => sum + t.amount, 0)
+
+        const byCategory = transactions
+            .filter(t => t.type === 'expense')
+            .reduce((acc, t) => {
+                acc[t.category] = (acc[t.category] || 0) + t.amount
+                return acc
+            }, {})
+
+        res.json({
+            income,
+            expenses,
+            net: income - expenses,
+            byCategory
+        })
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message })
+    }
+})
 // Get single transaction
 router.get('/:id', auth, async (req, res) => {
     try {
