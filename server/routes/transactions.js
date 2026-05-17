@@ -1,3 +1,12 @@
+import express from 'express';
+import Groq from 'groq-sdk';
+import Transaction from '../models/Transaction.js';
+import auth from '../middleware/auth.js';
+
+const router = express.Router();
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+// Parse and create transaction
 router.post('/parse', auth, async (req, res) => {
     try {
         const { input } = req.body;
@@ -25,7 +34,6 @@ router.post('/parse', auth, async (req, res) => {
 
         const inputType = classifyCompletion.choices[0].message.content.trim().toLowerCase()
 
-        // Step 2a — if transaction, parse and save it
         if (inputType === 'transaction') {
             const parseCompletion = await groq.chat.completions.create({
                 model: 'llama-3.3-70b-versatile',
@@ -100,10 +108,98 @@ router.post('/parse', auth, async (req, res) => {
         })
 
         const answer = answerCompletion.choices[0].message.content
-
         return res.json({ responseType: 'answer', answer })
 
     } catch (err) {
         res.status(500).json({ message: 'Server error', error: err.message })
     }
 })
+
+// Get all transactions for logged in user
+router.get('/', auth, async (req, res) => {
+    try {
+        const transactions = await Transaction.find({ userId: req.userId })
+            .sort({ date: -1 });
+        res.json(transactions);
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
+// Get monthly summary
+router.get('/summary', auth, async (req, res) => {
+    try {
+        const now = new Date()
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+        const transactions = await Transaction.find({
+            userId: req.userId,
+            date: { $gte: startOfMonth }
+        })
+        const income = transactions
+            .filter(t => t.type === 'income')
+            .reduce((sum, t) => sum + t.amount, 0)
+        const expenses = transactions
+            .filter(t => t.type === 'expense')
+            .reduce((sum, t) => sum + t.amount, 0)
+        const byCategory = transactions
+            .filter(t => t.type === 'expense')
+            .reduce((acc, t) => {
+                acc[t.category] = (acc[t.category] || 0) + t.amount
+                return acc
+            }, {})
+        res.json({ income, expenses, net: income - expenses, byCategory })
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message })
+    }
+})
+
+// Get single transaction
+router.get('/:id', auth, async (req, res) => {
+    try {
+        const transaction = await Transaction.findOne({
+            _id: req.params.id,
+            userId: req.userId
+        })
+        if (!transaction) {
+            return res.status(404).json({ message: 'Transaction not found' })
+        }
+        res.json(transaction)
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message })
+    }
+})
+
+// Edit a transaction
+router.put('/:id', auth, async (req, res) => {
+    try {
+        const transaction = await Transaction.findOneAndUpdate(
+            { _id: req.params.id, userId: req.userId },
+            req.body,
+            { new: true }
+        );
+        if (!transaction) {
+            return res.status(404).json({ message: 'Transaction not found' });
+        }
+        res.json(transaction);
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
+// Delete a transaction
+router.delete('/:id', auth, async (req, res) => {
+    try {
+        const transaction = await Transaction.findOneAndDelete({
+            _id: req.params.id,
+            userId: req.userId
+        });
+        if (!transaction) {
+            return res.status(404).json({ message: 'Transaction not found' });
+        }
+        res.json({ message: 'Transaction deleted' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message });
+    }
+});
+
+export default router;

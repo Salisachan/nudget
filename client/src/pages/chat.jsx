@@ -82,6 +82,19 @@ function Chat() {
                                 onDelete={handleDelete}
                             />
                         )}
+                        {msg.type === 'answer' && (
+                            <div style={{ textAlign: 'left' }}>
+                                <p style={{
+                                    background: '#FFF0EA',
+                                    padding: '12px 16px',
+                                    borderRadius: '12px',
+                                    display: 'inline-block',
+                                    maxWidth: '70%'
+                                }}>
+                                    {msg.text}
+                                </p>
+                            </div>
+                        )}
                         {msg.type === 'error' && (
                             <div>
                                 <p>{msg.text}</p>
