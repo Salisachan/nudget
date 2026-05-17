@@ -40,15 +40,19 @@ function Chat() {
 
         try {
             const res = await api.post('/transactions/parse', { input })
-            const transaction = res.data.transaction
-            addTransaction(transaction)
-            const cardMessage = { type: 'card', transaction }
-            setMessages(prev => [...prev, cardMessage])
+
+            if (res.data.responseType === 'transaction') {
+                const transaction = res.data.transaction
+                addTransaction(transaction)
+                const cardMessage = { type: 'card', transaction }
+                setMessages(prev => [...prev, cardMessage])
+            } else {
+                const answerMessage = { type: 'answer', text: res.data.answer }
+                setMessages(prev => [...prev, answerMessage])
+            }
         } catch (err) {
-            const errorMessage = { type: 'error', text: 'Could not parse transaction. Please try again.' }
+            const errorMessage = { type: 'error', text: 'Could not process your input. Please try again.' }
             setMessages(prev => [...prev, errorMessage])
-        } finally {
-            setLoading(false)
         }
     }
 
