@@ -11,7 +11,6 @@ function Chat() {
     const bottomRef = useRef(null)
     const { addTransaction, removeTransaction } = useTransactions()
 
-    // fetch last 10 transactions on load
     useEffect(() => {
         const fetchRecent = async () => {
             try {
@@ -25,7 +24,6 @@ function Chat() {
         fetchRecent()
     }, [])
 
-    // auto scroll to bottom
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
     }, [messages])
@@ -40,7 +38,7 @@ function Chat() {
 
         try {
             const res = await api.post('/transactions/parse', { input })
-
+            console.log('Response:', res.data)
             if (res.data.responseType === 'transaction') {
                 const transaction = res.data.transaction
                 addTransaction(transaction)
@@ -51,8 +49,11 @@ function Chat() {
                 setMessages(prev => [...prev, answerMessage])
             }
         } catch (err) {
+            console.log('Error:', err)
             const errorMessage = { type: 'error', text: 'Could not process your input. Please try again.' }
             setMessages(prev => [...prev, errorMessage])
+        } finally {
+            setLoading(false)
         }
     }
 

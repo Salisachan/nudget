@@ -33,6 +33,7 @@ router.post('/parse', auth, async (req, res) => {
         })
 
         const inputType = classifyCompletion.choices[0].message.content.trim().toLowerCase()
+        console.log('Input type:', inputType)
 
         if (inputType === 'transaction') {
             const parseCompletion = await groq.chat.completions.create({
@@ -108,6 +109,7 @@ router.post('/parse', auth, async (req, res) => {
         })
 
         const answer = answerCompletion.choices[0].message.content
+        console.log('Answer:', answer)
         return res.json({ responseType: 'answer', answer })
 
     } catch (err) {

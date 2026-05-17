@@ -4,6 +4,8 @@ import api from '../api'
 function TransactionCard({ transaction, onDelete }) {
     const navigate = useNavigate()
 
+    if (!transaction) return null
+
     const handleDelete = async () => {
         try {
             await api.delete(`/transactions/${transaction._id}`)
