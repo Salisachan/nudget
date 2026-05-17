@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Navbar from '../components/Navbar'
 import useDashboard from '../hooks/useDashboard'
+import BudgetLimits from '../components/BudgetLimits'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, PieChart, Pie, Legend } from 'recharts'
 
 const COLORS = ['#FF6B35', '#FFB347', '#FFD700', '#90EE90', '#87CEEB', '#DDA0DD', '#F08080', '#98FB98']
@@ -112,6 +113,12 @@ function Dashboard() {
                         </ResponsiveContainer>
                     )}
                 </div>
+
+                {/* Budget Limits */}
+                <div style={{ marginTop: '32px' }}>
+                    <BudgetLimits />
+                </div>
+
             </div>
         </div>
     )
