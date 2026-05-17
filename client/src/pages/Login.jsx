@@ -29,29 +29,45 @@ function Login() {
     }
 
     return (
-        <div>
-            <h1>Login</h1>
-            {error && <p>{error}</p>}
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Login'}
-                </button>
-            </form>
-            <p>Don't have an account? <Link to="/register">Register</Link></p>
+        <div className="min-vh-100 d-flex align-items-center justify-content-center bg-nudget-light">
+            <div className="card border-0 shadow-sm rounded-4 p-5" style={{ width: '100%', maxWidth: '420px' }}>
+                <Link to="/" className="text-nudget fw-semibold text-decoration-none mb-3 d-inline-block">← Back to home</Link>
+                <div className="text-center mb-4">
+                    <div className="fw-bold fs-3 text-nudget mb-1">Nudget</div>
+                    <p className="text-muted">Welcome back 👋</p>
+                </div>
+                {error && <div className="alert alert-danger py-2">{error}</div>}
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-3">
+                        <label className="form-label fw-semibold">Email</label>
+                        <input
+                            type="email"
+                            className="form-control"
+                            placeholder="you@email.com"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="form-label fw-semibold">Password</label>
+                        <input
+                            type="password"
+                            className="form-control"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button className="btn btn-nudget w-100 py-2 fw-bold" type="submit" disabled={loading}>
+                        {loading ? 'Logging in...' : 'Login'}
+                    </button>
+                </form>
+                <p className="text-center text-muted mt-4 mb-0" style={{ fontSize: '14px' }}>
+                    Don't have an account? <Link to="/register" className="text-nudget fw-semibold text-decoration-none">Register</Link>
+                </p>
+            </div>
         </div>
     )
 }

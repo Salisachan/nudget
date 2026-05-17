@@ -1,0 +1,48 @@
+:root {
+    --nudget-orange: #FF6B35;
+    --nudget-orange-dark: #e55a25;
+    --nudget-orange-light: #FFF0EA;
+    --nudget-bg: #FFF9F7;
+}
+
+.btn-nudget {
+    background-color: var(--nudget-orange);
+    border-color: var(--nudget-orange);
+    color: white;
+    font-weight: 600;
+}
+
+.btn-nudget:hover {
+    background-color: var(--nudget-orange-dark);
+    border-color: var(--nudget-orange-dark);
+    color: white;
+}
+
+.btn-nudget-outline {
+    background-color: white;
+    border: 2px solid var(--nudget-orange);
+    color: var(--nudget-orange);
+    font-weight: 600;
+}
+
+.btn-nudget-outline:hover {
+    background-color: var(--nudget-orange);
+    color: white;
+}
+
+.text-nudget {
+    color: var(--nudget-orange) !important;
+}
+
+.bg-nudget-light {
+    background-color: var(--nudget-bg) !important;
+}
+
+.badge-nudget {
+    background: var(--nudget-orange-light);
+    color: var(--nudget-orange);
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
