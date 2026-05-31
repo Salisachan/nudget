@@ -13,19 +13,29 @@ function Transactions() {
         return groups
     }, {})
 
-    if (loading) return <div>Loading...</div>
+    if (loading) return (
+        <div className="bg-nudget-light min-vh-100">
+            <Navbar />
+            <div className="container py-5 text-center text-muted">Loading...</div>
+        </div>
+    )
 
     return (
-        <div>
+        <div className="bg-nudget-light min-vh-100">
             <Navbar />
-            <div>
-                <h1>Transactions</h1>
+            <div className="container py-4" style={{ maxWidth: '700px' }}>
+                <h1 className="fw-bold mb-4">Transactions</h1>
+
                 {Object.keys(groupedByMonth).length === 0 && (
-                    <p>No transactions yet. Go to Chat to log your first one!</p>
+                    <div className="text-center text-muted py-5">
+                        <p className="fs-5">No transactions yet</p>
+                        <p>Go to Chat to log your first one!</p>
+                    </div>
                 )}
+
                 {Object.entries(groupedByMonth).map(([month, items]) => (
-                    <div key={month}>
-                        <h2>{month}</h2>
+                    <div key={month} className="mb-4">
+                        <h5 className="fw-bold text-muted mb-3">{month}</h5>
                         {items.map(transaction => (
                             <TransactionCard
                                 key={transaction._id}

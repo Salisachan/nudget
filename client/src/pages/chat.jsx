@@ -38,7 +38,6 @@ function Chat() {
 
         try {
             const res = await api.post('/transactions/parse', { input })
-            console.log('Response:', res.data)
             if (res.data.responseType === 'transaction') {
                 const transaction = res.data.transaction
                 addTransaction(transaction)
@@ -49,7 +48,6 @@ function Chat() {
                 setMessages(prev => [...prev, answerMessage])
             }
         } catch (err) {
-            console.log('Error:', err)
             const errorMessage = { type: 'error', text: 'Could not process your input. Please try again.' }
             setMessages(prev => [...prev, errorMessage])
         } finally {
@@ -67,54 +65,78 @@ function Chat() {
     }
 
     return (
-        <div>
+        <div className="d-flex flex-column vh-100 bg-nudget-light">
             <Navbar />
-            <div>
-                {messages.map((msg, index) => (
-                    <div key={index}>
-                        {msg.type === 'user' && (
-                            <div style={{ textAlign: 'right' }}>
-                                <p>{msg.text}</p>
+
+            {/* Messages area */}
+            <div className="flex-grow-1 overflow-auto px-3 py-4">
+                <div className="container" style={{ maxWidth: '700px' }}>
+                    {messages.length === 0 && (
+                        <div className="text-center text-muted mt-5">
+                            <p className="fs-5">👋 Start logging your money!</p>
+                            <p>Try typing "coffee 6 bucks" or "got paid 2800"</p>
+                        </div>
+                    )}
+
+                    {messages.map((msg, index) => (
+                        <div key={index} className="mb-3">
+                            {msg.type === 'user' && (
+                                <div className="d-flex justify-content-end">
+                                    <div className="bg-nudget text-white px-3 py-2 rounded-4" style={{ maxWidth: '70%' }}>
+                                        {msg.text}
+                                    </div>
+                                </div>
+                            )}
+                            {msg.type === 'card' && (
+                                <div className="d-flex justify-content-start">
+                                    <div style={{ maxWidth: '85%', width: '100%' }}>
+                                        <TransactionCard transaction={msg.transaction} onDelete={handleDelete} />
+                                    </div>
+                                </div>
+                            )}
+                            {msg.type === 'answer' && (
+                                <div className="d-flex justify-content-start">
+                                    <div className="px-3 py-2 rounded-4" style={{ background: '#FFF0EA', maxWidth: '70%' }}>
+                                        {msg.text}
+                                    </div>
+                                </div>
+                            )}
+                            {msg.type === 'error' && (
+                                <div className="d-flex justify-content-start">
+                                    <div className="bg-danger-subtle text-danger px-3 py-2 rounded-4" style={{ maxWidth: '70%' }}>
+                                        {msg.text}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {loading && (
+                        <div className="d-flex justify-content-start mb-3">
+                            <div className="px-3 py-2 rounded-4 text-muted" style={{ background: '#FFF0EA' }}>
+                                Parsing...
                             </div>
-                        )}
-                        {msg.type === 'card' && (
-                            <TransactionCard
-                                transaction={msg.transaction}
-                                onDelete={handleDelete}
-                            />
-                        )}
-                        {msg.type === 'answer' && (
-                            <div style={{ textAlign: 'left' }}>
-                                <p style={{
-                                    background: '#FFF0EA',
-                                    padding: '12px 16px',
-                                    borderRadius: '12px',
-                                    display: 'inline-block',
-                                    maxWidth: '70%'
-                                }}>
-                                    {msg.text}
-                                </p>
-                            </div>
-                        )}
-                        {msg.type === 'error' && (
-                            <div>
-                                <p>{msg.text}</p>
-                            </div>
-                        )}
-                    </div>
-                ))}
-                {loading && <p>Parsing...</p>}
-                <div ref={bottomRef} />
+                        </div>
+                    )}
+                    <div ref={bottomRef} />
+                </div>
             </div>
-            <div>
-                <input
-                    type="text"
-                    placeholder="Type a transaction... e.g. coffee 6 bucks"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                />
-                <button onClick={handleSend} disabled={loading}>Send</button>
+
+            {/* Input bar */}
+            <div className="border-top bg-white px-3 py-3">
+                <div className="container d-flex gap-2" style={{ maxWidth: '700px' }}>
+                    <input
+                        type="text"
+                        className="form-control rounded-pill px-3"
+                        placeholder="Type a transaction... e.g. coffee 6 bucks"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                    />
+                    <button className="btn btn-nudget rounded-pill px-4 fw-bold" onClick={handleSend} disabled={loading}>
+                        Send
+                    </button>
+                </div>
             </div>
         </div>
     )

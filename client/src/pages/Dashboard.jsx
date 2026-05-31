@@ -15,70 +15,70 @@ function Dashboard() {
         value: parseFloat(value.toFixed(2))
     }))
 
-    if (loading) return <div>Loading...</div>
-    if (error) return <div>Something went wrong.</div>
-
-    return (
+    if (loading) return (
         <div>
             <Navbar />
-            <div>
-                <h1>Dashboard</h1>
-                <p>This month's overview</p>
+            <div className="container py-5 text-center text-muted">Loading...</div>
+        </div>
+    )
+    if (error) return (
+        <div>
+            <Navbar />
+            <div className="container py-5 text-center text-muted">Something went wrong.</div>
+        </div>
+    )
+
+    return (
+        <div className="bg-nudget-light min-vh-100">
+            <Navbar />
+            <div className="container py-4" style={{ maxWidth: '900px' }}>
+                <h1 className="fw-bold mb-1">Dashboard</h1>
+                <p className="text-muted mb-4">This month's overview</p>
 
                 {/* Summary Cards */}
-                <div style={{ display: 'flex', gap: '16px', marginBottom: '32px' }}>
-                    <div style={{ padding: '24px', background: '#FFF9F7', borderRadius: '12px', flex: 1 }}>
-                        <p>Total Income</p>
-                        <h2 style={{ color: '#22c55e' }}>${summary.income.toFixed(2)}</h2>
+                <div className="row g-3 mb-4">
+                    <div className="col-md-4">
+                        <div className="card border-0 shadow-sm rounded-4 p-4">
+                            <p className="text-muted mb-1">Total Income</p>
+                            <h3 className="fw-bold text-success mb-0">${summary.income.toFixed(2)}</h3>
+                        </div>
                     </div>
-                    <div style={{ padding: '24px', background: '#FFF9F7', borderRadius: '12px', flex: 1 }}>
-                        <p>Total Expenses</p>
-                        <h2 style={{ color: '#ef4444' }}>${summary.expenses.toFixed(2)}</h2>
+                    <div className="col-md-4">
+                        <div className="card border-0 shadow-sm rounded-4 p-4">
+                            <p className="text-muted mb-1">Total Expenses</p>
+                            <h3 className="fw-bold text-danger mb-0">${summary.expenses.toFixed(2)}</h3>
+                        </div>
                     </div>
-                    <div style={{ padding: '24px', background: '#FFF9F7', borderRadius: '12px', flex: 1 }}>
-                        <p>Net Balance</p>
-                        <h2 style={{ color: summary.net >= 0 ? '#22c55e' : '#ef4444' }}>
-                            ${summary.net.toFixed(2)}
-                        </h2>
+                    <div className="col-md-4">
+                        <div className="card border-0 shadow-sm rounded-4 p-4">
+                            <p className="text-muted mb-1">Net Balance</p>
+                            <h3 className={`fw-bold mb-0 ${summary.net >= 0 ? 'text-success' : 'text-danger'}`}>
+                                ${summary.net.toFixed(2)}
+                            </h3>
+                        </div>
                     </div>
                 </div>
 
                 {/* Category Chart */}
-                <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                        <h2>Spending by Category</h2>
-                        <div style={{ display: 'flex', gap: '8px' }}>
+                <div className="card border-0 shadow-sm rounded-4 p-4 mb-4">
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h5 className="fw-bold mb-0">Spending by Category</h5>
+                        <div className="d-flex gap-2">
                             <button
-                                onClick={() => setChartType('bar')}
-                                style={{
-                                    padding: '8px 16px',
-                                    borderRadius: '8px',
-                                    border: '2px solid #FF6B35',
-                                    background: chartType === 'bar' ? '#FF6B35' : 'white',
-                                    color: chartType === 'bar' ? 'white' : '#FF6B35',
-                                    cursor: 'pointer',
-                                    fontWeight: '600'
-                                }}>
+                                className={`btn btn-sm rounded-pill px-3 ${chartType === 'bar' ? 'btn-nudget' : 'btn-nudget-outline'}`}
+                                onClick={() => setChartType('bar')}>
                                 Bar
                             </button>
                             <button
-                                onClick={() => setChartType('pie')}
-                                style={{
-                                    padding: '8px 16px',
-                                    borderRadius: '8px',
-                                    border: '2px solid #FF6B35',
-                                    background: chartType === 'pie' ? '#FF6B35' : 'white',
-                                    color: chartType === 'pie' ? 'white' : '#FF6B35',
-                                    cursor: 'pointer',
-                                    fontWeight: '600'
-                                }}>
+                                className={`btn btn-sm rounded-pill px-3 ${chartType === 'pie' ? 'btn-nudget' : 'btn-nudget-outline'}`}
+                                onClick={() => setChartType('pie')}>
                                 Pie
                             </button>
                         </div>
                     </div>
 
                     {chartData.length === 0 ? (
-                        <p>No expense data yet for this month.</p>
+                        <p className="text-muted text-center py-4 mb-0">No expense data yet for this month.</p>
                     ) : (
                         <ResponsiveContainer width="100%" height={300}>
                             {chartType === 'bar' ? (
@@ -115,7 +115,7 @@ function Dashboard() {
                 </div>
 
                 {/* Budget Limits */}
-                <div style={{ marginTop: '32px' }}>
+                <div className="card border-0 shadow-sm rounded-4 p-4">
                     <BudgetLimits />
                 </div>
 
