@@ -183,6 +183,24 @@ router.get('/summary', auth, async (req, res) => {
     }
 })
 
+// Get the date range of user's transactions
+router.get('/range', auth, async (req, res) => {
+    try {
+        const earliest = await Transaction.findOne({ userId: req.userId })
+            .sort({ date: 1 })
+
+        if (!earliest) {
+            const now = new Date()
+            return res.json({ firstMonth: now.getMonth() + 1, firstYear: now.getFullYear() })
+        }
+
+        const date = new Date(earliest.date)
+        res.json({ firstMonth: date.getMonth() + 1, firstYear: date.getFullYear() })
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message })
+    }
+})
+
 // Get single transaction
 router.get('/:id', auth, async (req, res) => {
     try {

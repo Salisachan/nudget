@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react'
 import api from '../api'
 
-function useDashboard() {
+function useDashboard(month, year) {
     const [summary, setSummary] = useState({ income: 0, expenses: 0, net: 0, byCategory: {} })
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
 
     useEffect(() => {
         const fetchSummary = async () => {
+            setLoading(true)
             try {
-                const res = await api.get('/transactions/summary')
+                const res = await api.get(`/transactions/summary?month=${month}&year=${year}`)
                 setSummary(res.data)
             } catch (err) {
                 setError(err.message)
@@ -18,7 +19,7 @@ function useDashboard() {
             }
         }
         fetchSummary()
-    }, [])
+    }, [month, year])
 
     return { summary, loading, error }
 }
