@@ -46,3 +46,7 @@
     font-size: 14px;
     font-weight: 600;
 }
+
+.bg-nudget {
+    background-color: var(--nudget-orange) !important;
+}

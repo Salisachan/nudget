@@ -12,16 +12,27 @@ function Chat() {
     const { addTransaction, removeTransaction } = useTransactions()
 
     useEffect(() => {
-        const fetchRecent = async () => {
+        const fetchMessages = async () => {
             try {
-                const res = await api.get('/transactions?limit=10')
-                const cards = res.data.map(t => ({ type: 'card', transaction: t }))
-                setMessages(cards)
+                const res = await api.get('/transactions/messages')
+                console.log('Loaded messages:', res.data)
+                const loaded = res.data.map(m => {
+                    if (m.role === 'user') {
+                        return { type: 'user', text: m.content }
+                    } else if (m.type === 'card') {
+                        return { type: 'card', transaction: m.transaction }
+                    } else if (m.type === 'answer') {
+                        return { type: 'answer', text: m.content }
+                    } else {
+                        return { type: 'error', text: m.content }
+                    }
+                })
+                setMessages(loaded)
             } catch (err) {
                 console.error(err)
             }
         }
-        fetchRecent()
+        fetchMessages()
     }, [])
 
     useEffect(() => {
@@ -68,9 +79,8 @@ function Chat() {
         <div className="d-flex flex-column vh-100 bg-nudget-light">
             <Navbar />
 
-            {/* Messages area */}
             <div className="flex-grow-1 overflow-auto px-3 py-4">
-                <div className="container" style={{ maxWidth: '700px' }}>
+                <div className="container" style={{ maxWidth: '900px' }}>
                     {messages.length === 0 && (
                         <div className="text-center text-muted mt-5">
                             <p className="fs-5">👋 Start logging your money!</p>
@@ -89,7 +99,7 @@ function Chat() {
                             )}
                             {msg.type === 'card' && (
                                 <div className="d-flex justify-content-start">
-                                    <div style={{ maxWidth: '85%', width: '100%' }}>
+                                    <div style={{ maxWidth: '300px', width: '100%' }}>
                                         <TransactionCard transaction={msg.transaction} onDelete={handleDelete} />
                                     </div>
                                 </div>
@@ -122,7 +132,6 @@ function Chat() {
                 </div>
             </div>
 
-            {/* Input bar */}
             <div className="border-top bg-white px-3 py-3">
                 <div className="container d-flex gap-2" style={{ maxWidth: '700px' }}>
                     <input

@@ -2,6 +2,8 @@ import express from 'express';
 import Groq from 'groq-sdk';
 import Transaction from '../models/Transaction.js';
 import auth from '../middleware/auth.js';
+import saveMessage from '../utils/saveMessage.js';
+import Message from '../models/Message.js';
 
 const router = express.Router();
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -10,6 +12,9 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 router.post('/parse', auth, async (req, res) => {
     try {
         const { input } = req.body;
+
+        // Save the user's message first
+        await saveMessage(req.userId, 'user', 'text', input)
 
         // Step 1 — classify input as transaction or question
         const classifyCompletion = await groq.chat.completions.create({
@@ -33,7 +38,6 @@ router.post('/parse', auth, async (req, res) => {
         })
 
         const inputType = classifyCompletion.choices[0].message.content.trim().toLowerCase()
-        console.log('Input type:', inputType)
 
         if (inputType === 'transaction') {
             const parseCompletion = await groq.chat.completions.create({
@@ -70,6 +74,10 @@ router.post('/parse', auth, async (req, res) => {
             })
 
             await transaction.save()
+
+            // Save the bot's card message
+            await saveMessage(req.userId, 'bot', 'card', null, transaction)
+
             return res.status(201).json({ responseType: 'transaction', transaction })
         }
 
@@ -109,9 +117,24 @@ router.post('/parse', auth, async (req, res) => {
         })
 
         const answer = answerCompletion.choices[0].message.content
-        console.log('Answer:', answer)
+
+        // Save the bot's answer message
+        await saveMessage(req.userId, 'bot', 'answer', answer)
+
         return res.json({ responseType: 'answer', answer })
 
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message })
+    }
+})
+
+// Get chat history (last 30 messages)
+router.get('/messages', auth, async (req, res) => {
+    try {
+        const messages = await Message.find({ userId: req.userId })
+            .sort({ createdAt: -1 })
+            .limit(30)
+        res.json(messages.reverse())
     } catch (err) {
         res.status(500).json({ message: 'Server error', error: err.message })
     }
@@ -132,10 +155,15 @@ router.get('/', auth, async (req, res) => {
 router.get('/summary', auth, async (req, res) => {
     try {
         const now = new Date()
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+        const month = parseInt(req.query.month) || now.getMonth() + 1
+        const year = parseInt(req.query.year) || now.getFullYear()
+
+        const startOfMonth = new Date(year, month - 1, 1)
+        const endOfMonth = new Date(year, month, 1)
+
         const transactions = await Transaction.find({
             userId: req.userId,
-            date: { $gte: startOfMonth }
+            date: { $gte: startOfMonth, $lt: endOfMonth }
         })
         const income = transactions
             .filter(t => t.type === 'income')
