@@ -10,7 +10,7 @@ function FloatingButton() {
             style={{
                 position: 'fixed',
                 bottom: '24px',
-                right: 'max(24px, calc(50% - 450px - 8px))',
+                right: '40px',
                 width: '60px',
                 height: '60px',
                 fontSize: '28px',

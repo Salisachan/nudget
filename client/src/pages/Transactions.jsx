@@ -1,6 +1,7 @@
 import Navbar from '../components/Navbar'
 import TransactionCard from '../components/TransactionCard'
 import useTransactions from '../hooks/useTransactions'
+import FloatingButton from '../components/FloatingButton'
 
 function Transactions() {
     const { transactions, loading, removeTransaction } = useTransactions()
@@ -23,7 +24,7 @@ function Transactions() {
     return (
         <div className="bg-nudget-light min-vh-100">
             <Navbar />
-            <div className="container py-4" style={{ maxWidth: '700px' }}>
+            <div className="container py-4" style={{ maxWidth: '900px' }}>
                 <h1 className="fw-bold mb-4">Transactions</h1>
 
                 {Object.keys(groupedByMonth).length === 0 && (
@@ -41,11 +42,13 @@ function Transactions() {
                                 key={transaction._id}
                                 transaction={transaction}
                                 onDelete={removeTransaction}
+                                row={true}
                             />
                         ))}
                     </div>
                 ))}
             </div>
+            <FloatingButton />
         </div>
     )
 }
