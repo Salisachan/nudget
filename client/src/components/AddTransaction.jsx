@@ -10,7 +10,7 @@ function AddTransactionModal({ show, onClose, onAdd }) {
         amount: '',
         category: 'Food & Drink',
         description: '',
-        date: new Date().toISOString().split('T')[0]
+        date: new Date().toLocaleDateString('en-CA')
     })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -30,7 +30,11 @@ function AddTransactionModal({ show, onClose, onAdd }) {
         setLoading(true)
         setError('')
         try {
-            const res = await api.post('/transactions/manual', form)
+            const formToSend = {
+                ...form,
+                date: new Date(form.date + 'T12:00:00').toISOString()
+            }
+            const res = await api.post('/transactions/manual', formToSend)
             onAdd(res.data.transaction)
             onClose()
             setForm({
@@ -38,7 +42,7 @@ function AddTransactionModal({ show, onClose, onAdd }) {
                 amount: '',
                 category: 'Food & Drink',
                 description: '',
-                date: new Date().toISOString().split('T')[0]
+                date: new Date().toLocaleDateString('en-CA')
             })
         } catch (err) {
             setError('Could not save transaction. Please try again.')

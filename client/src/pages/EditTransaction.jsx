@@ -56,6 +56,17 @@ function EditTransaction() {
                                 placeholder="Description"
                             />
                         </div>
+                        <div className="mb-4">
+                            <label className="form-label fw-semibold">Date</label>
+                            <input
+                                type="date"
+                                name="date"
+                                className="form-control"
+                                value={form.date}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
                         <div className="d-flex gap-2">
                             <button type="submit" className="btn btn-nudget rounded-pill px-4 fw-bold" disabled={loading}>
                                 {loading ? 'Saving...' : 'Save'}

@@ -9,6 +9,7 @@ function useEditTransaction(id) {
         amount: '',
         category: '',
         description: '',
+        date: '',
     })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
@@ -22,6 +23,7 @@ function useEditTransaction(id) {
                     amount: res.data.amount,
                     category: res.data.category,
                     description: res.data.description,
+                    date: new Date(res.data.date).toLocaleDateString('en-CA'),
                 })
             } catch (err) {
                 setError('Transaction not found')
@@ -38,8 +40,12 @@ function useEditTransaction(id) {
         e.preventDefault()
         setLoading(true)
         try {
-            await api.put(`/transactions/${id}`, form)
-            navigate('/chat')
+            const formToSend = {
+                ...form,
+                date: new Date(form.date + 'T12:00:00').toISOString()
+            }
+            await api.put(`/transactions/${id}`, formToSend)
+            window.location.href = '/chat'
         } catch (err) {
             setError('Could not update transaction')
         } finally {

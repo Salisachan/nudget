@@ -3,7 +3,14 @@ import Message from '../models/Message.js';
 const MAX_MESSAGES = 100;
 
 async function saveMessage(userId, role, type, content, transaction = null) {
-    await Message.create({ userId, role, type, content, transaction });
+    await Message.create({
+        userId,
+        role,
+        type,
+        content,
+        transaction,
+        transactionId: transaction ? transaction._id : null
+    });
 
     // Enforce the cap — delete oldest if over limit
     const count = await Message.countDocuments({ userId });

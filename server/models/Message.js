@@ -6,6 +6,7 @@ const messageSchema = new mongoose.Schema({
     type: { type: String, enum: ['text', 'card', 'answer', 'error'], required: true },
     content: { type: String },
     transaction: { type: Object },
+    transactionId: { type: mongoose.Schema.Types.ObjectId, ref: 'Transaction' },
 }, { timestamps: true });
 
 export default mongoose.model('Message', messageSchema);
