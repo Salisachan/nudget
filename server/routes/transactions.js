@@ -128,6 +128,32 @@ router.post('/parse', auth, async (req, res) => {
     }
 })
 
+// Manual transaction entry
+router.post('/manual', auth, async (req, res) => {
+    try {
+        const { type, amount, category, description, date } = req.body
+
+        const transaction = new Transaction({
+            userId: req.userId,
+            type,
+            amount: parseFloat(amount),
+            category,
+            description,
+            date: new Date(date),
+            input: `Manual entry: ${description}`
+        })
+
+        await transaction.save()
+
+        // Save bot card message
+        await saveMessage(req.userId, 'bot', 'card', null, transaction)
+
+        res.status(201).json({ message: 'Transaction saved', transaction })
+    } catch (err) {
+        res.status(500).json({ message: 'Server error', error: err.message })
+    }
+})
+
 // Get chat history (last 30 messages)
 router.get('/messages', auth, async (req, res) => {
     try {

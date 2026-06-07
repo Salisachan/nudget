@@ -3,11 +3,13 @@ import api from '../api'
 import TransactionCard from '../components/TransactionCard'
 import Navbar from '../components/Navbar'
 import useTransactions from '../hooks/useTransactions'
+import AddTransaction from '../components/AddTransaction'
 
 function Chat() {
     const [input, setInput] = useState('')
     const [messages, setMessages] = useState([])
     const [loading, setLoading] = useState(false)
+    const [showModal, setShowModal] = useState(false)
     const bottomRef = useRef(null)
     const { addTransaction, removeTransaction } = useTransactions()
 
@@ -15,7 +17,6 @@ function Chat() {
         const fetchMessages = async () => {
             try {
                 const res = await api.get('/transactions/messages')
-                console.log('Loaded messages:', res.data)
                 const loaded = res.data.map(m => {
                     if (m.role === 'user') {
                         return { type: 'user', text: m.content }
@@ -132,6 +133,7 @@ function Chat() {
                 </div>
             </div>
 
+            {/* Input bar */}
             <div className="border-top bg-white px-3 py-3">
                 <div className="container d-flex gap-2" style={{ maxWidth: '700px' }}>
                     <input
@@ -145,8 +147,21 @@ function Chat() {
                     <button className="btn btn-nudget rounded-pill px-4 fw-bold" onClick={handleSend} disabled={loading}>
                         Send
                     </button>
+                    <button className="btn btn-nudget-outline rounded-pill px-3 fw-bold" onClick={() => setShowModal(true)}>
+                        +
+                    </button>
                 </div>
             </div>
+
+            <AddTransaction
+                show={showModal}
+                onClose={() => setShowModal(false)}
+                onAdd={(transaction) => {
+                    addTransaction(transaction)
+                    const cardMessage = { type: 'card', transaction }
+                    setMessages(prev => [...prev, cardMessage])
+                }}
+            />
         </div>
     )
 }
