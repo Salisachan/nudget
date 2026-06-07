@@ -2,9 +2,14 @@ import { useParams } from 'react-router-dom'
 import useEditTransaction from '../hooks/useEditTransaction'
 import Navbar from '../components/Navbar'
 
+const EXPENSE_CATEGORIES = ['Food & Drink', 'Transport', 'Shopping', 'Entertainment', 'Health', 'Housing', 'Education', 'Other']
+const INCOME_CATEGORIES = ['Salary', 'Freelance', 'Investment', 'Gift', 'Other Income']
+
 function EditTransaction() {
     const { id } = useParams()
     const { form, loading, error, handleChange, handleSubmit, navigate } = useEditTransaction(id)
+
+    const categories = form.type === 'expense' ? EXPENSE_CATEGORIES : INCOME_CATEGORIES
 
     return (
         <div className="bg-nudget-light min-vh-100">
@@ -35,15 +40,11 @@ function EditTransaction() {
                         </div>
                         <div className="mb-3">
                             <label className="form-label fw-semibold">Category</label>
-                            <input
-                                type="text"
-                                name="category"
-                                className="form-control"
-                                value={form.category}
-                                onChange={handleChange}
-                                placeholder="Category"
-                                required
-                            />
+                            <select name="category" className="form-select" value={form.category} onChange={handleChange}>
+                                {categories.map(c => (
+                                    <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
                         </div>
                         <div className="mb-4">
                             <label className="form-label fw-semibold">Description</label>
