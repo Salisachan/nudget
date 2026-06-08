@@ -4,6 +4,7 @@ import Transaction from '../models/Transaction.js';
 import auth from '../middleware/auth.js';
 import saveMessage from '../utils/saveMessage.js';
 import Message from '../models/Message.js';
+import chrono from 'chrono-node';
 
 const router = express.Router();
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
@@ -57,7 +58,6 @@ router.post('/parse', auth, async (req, res) => {
         - category: one of these expense categories: "Food & Drink", "Transport", "Shopping", "Entertainment", "Health", "Housing", "Education", "Other"
         or one of these income categories: "Salary", "Freelance", "Investment", "Gift", "Other Income"
         - description: a short description of the transaction
-        - date: today's date is ${today}. You MUST detect any date references in the input and return the correct date. "yesterday" means ${yesterday}. "today" means ${today}. For other relative dates like "last friday" or "2 days ago", calculate the correct date from today's date ${today} and return it in YYYY-MM-DD format. If no date is mentioned, return today's date ${today}.
         Example input: "coffee 6 bucks"
         Example output: {"type":"expense","amount":6,"category":"Food & Drink","description":"Coffee","date":"${today}"}
         Example input: "yesterday lunch 12"
@@ -69,6 +69,10 @@ router.post('/parse', auth, async (req, res) => {
 
             const parsed = JSON.parse(parseCompletion.choices[0].message.content)
 
+            // Parse date from natural language using chrono-node
+            const parsedDates = chrono.parse(input)
+            const transactionDate = parsedDates.length > 0 ? parsedDates[0].start.date() : new Date()
+
             const transaction = new Transaction({
                 userId: req.userId,
                 type: parsed.type,
@@ -76,7 +80,7 @@ router.post('/parse', auth, async (req, res) => {
                 category: parsed.category,
                 description: parsed.description,
                 input: input,
-                date: parsed.date ? new Date(parsed.date + 'T12:00:00') : new Date()
+                date: transactionDate
             })
 
             await transaction.save()
