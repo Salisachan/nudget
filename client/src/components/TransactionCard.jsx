@@ -26,7 +26,7 @@ function TransactionCard({ transaction, onDelete, row = false }) {
                     {/* Left — date + details in columns */}
                     <div className="d-flex align-items-center gap-3">
                         <small className="text-muted" style={{ minWidth: '85px' }}>
-                            {new Date(transaction.date).toLocaleDateString()}
+                            {new Date(transaction.date).toLocaleDateString('en-CA', { timeZone: 'UTC' })}
                         </small>
                         <span className={`badge rounded-pill ${isIncome ? 'bg-success' : 'bg-danger'}`} style={{ fontSize: '10px', minWidth: '70px' }}>
                             {isIncome ? 'Income' : 'Expense'}
