@@ -56,7 +56,7 @@ router.post('/parse', auth, async (req, res) => {
         - category: one of these expense categories: "Food & Drink", "Transport", "Shopping", "Entertainment", "Health", "Housing", "Education", "Other"
         or one of these income categories: "Salary", "Freelance", "Investment", "Gift", "Other Income"
         - description: a short description of the transaction
-        - date: today's date is ${today}. If the user mentions a past date like "yesterday" or "last friday", return that date in YYYY-MM-DD format. Otherwise return today's date.
+        - date: today's date is ${today}. You MUST detect any date references in the input and return the correct date. "yesterday" means ${yesterday}. "today" means ${today}. For other relative dates like "last friday" or "2 days ago", calculate the correct date from today's date ${today} and return it in YYYY-MM-DD format. If no date is mentioned, return today's date ${today}.
         Example input: "coffee 6 bucks"
         Example output: {"type":"expense","amount":6,"category":"Food & Drink","description":"Coffee","date":"${today}"}
         Example input: "yesterday lunch 12"
