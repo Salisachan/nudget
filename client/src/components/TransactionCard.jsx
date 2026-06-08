@@ -6,8 +6,6 @@ function TransactionCard({ transaction, onDelete, row = false }) {
 
     if (!transaction) return null
 
-    console.log('Transaction date:', transaction.date)
-
     const handleDelete = async () => {
         try {
             await api.delete(`/transactions/${transaction._id}`)

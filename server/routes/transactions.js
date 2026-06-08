@@ -40,8 +40,9 @@ router.post('/parse', auth, async (req, res) => {
         const inputType = classifyCompletion.choices[0].message.content.trim().toLowerCase()
 
         if (inputType === 'transaction') {
-            const today = new Date().toLocaleDateString('en-CA')
-            const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('en-CA')
+            const now = new Date()
+            const today = now.toLocaleDateString('en-CA', { timeZone: 'UTC' })
+            const yesterday = new Date(now - 86400000).toLocaleDateString('en-CA', { timeZone: 'UTC' })
 
             const parseCompletion = await groq.chat.completions.create({
                 model: 'llama-3.3-70b-versatile',
