@@ -40,23 +40,27 @@ router.post('/parse', auth, async (req, res) => {
         const inputType = classifyCompletion.choices[0].message.content.trim().toLowerCase()
 
         if (inputType === 'transaction') {
+            const today = new Date().toLocaleDateString('en-CA')
+            const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('en-CA')
+
             const parseCompletion = await groq.chat.completions.create({
                 model: 'llama-3.3-70b-versatile',
                 messages: [
                     {
                         role: 'system',
                         content: `You are a financial transaction parser. Extract transaction details from natural language input.
-            Return ONLY a valid JSON object with no extra text, no markdown, no backticks.
-            The JSON must have exactly these fields:
-            - type: either "expense" or "income"
-            - amount: a number (no currency symbols)
-            - category: one of these expense categories: "Food & Drink", "Transport", "Shopping", "Entertainment", "Health", "Housing", "Education", "Other"
-            or one of these income categories: "Salary", "Freelance", "Investment", "Gift", "Other Income"
-            - description: a short description of the transaction
-            Example input: "coffee 6 bucks"
-            Example output: {"type":"expense","amount":6,"category":"Food & Drink","description":"Coffee"}
-            Example input: "got paid 2800"
-            Example output: {"type":"income","amount":2800,"category":"Salary","description":"Monthly pay"}`
+        Return ONLY a valid JSON object with no extra text, no markdown, no backticks.
+        The JSON must have exactly these fields:
+        - type: either "expense" or "income"
+        - amount: a number (no currency symbols)
+        - category: one of these expense categories: "Food & Drink", "Transport", "Shopping", "Entertainment", "Health", "Housing", "Education", "Other"
+        or one of these income categories: "Salary", "Freelance", "Investment", "Gift", "Other Income"
+        - description: a short description of the transaction
+        - date: today's date is ${today}. If the user mentions a past date like "yesterday" or "last friday", return that date in YYYY-MM-DD format. Otherwise return today's date.
+        Example input: "coffee 6 bucks"
+        Example output: {"type":"expense","amount":6,"category":"Food & Drink","description":"Coffee","date":"${today}"}
+        Example input: "yesterday lunch 12"
+        Example output: {"type":"expense","amount":12,"category":"Food & Drink","description":"Lunch","date":"${yesterday}"}`
                     },
                     { role: 'user', content: input }
                 ]
@@ -71,11 +75,11 @@ router.post('/parse', auth, async (req, res) => {
                 category: parsed.category,
                 description: parsed.description,
                 input: input,
+                date: parsed.date ? new Date(parsed.date + 'T12:00:00') : new Date()
             })
 
             await transaction.save()
 
-            // Save the bot's card message
             await saveMessage(req.userId, 'bot', 'card', null, transaction)
 
             return res.status(201).json({ responseType: 'transaction', transaction })
