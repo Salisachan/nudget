@@ -4,7 +4,7 @@ import Transaction from '../models/Transaction.js';
 import auth from '../middleware/auth.js';
 import saveMessage from '../utils/saveMessage.js';
 import Message from '../models/Message.js';
-import chrono from 'chrono-node';
+import * as chrono from 'chrono-node';
 
 const router = express.Router();
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
