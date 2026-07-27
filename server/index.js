@@ -5,10 +5,18 @@ import cors from 'cors';
 import authRoutes from './routes/auth.js';
 import transactionRoutes from './routes/transactions.js';
 import budgetRoutes from './routes/budgets.js';
+import session from 'express-session';
+import passport from './config/passport.js';
 
 const app = express();
 app.use(cors({ origin: '*' }));
 app.use(express.json())
+app.use(session({
+    secret: process.env.JWT_SECRET,
+    resave: false,
+    saveUninitialized: false
+}))
+app.use(passport.initialize())
 app.use('/api/auth', authRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/budgets', budgetRoutes);

@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import passport from '../config/passport.js';
 
 const router = express.Router();
 
@@ -53,5 +54,29 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ message: 'Server error', error: err.message });
     }
 });
+
+// Google OAuth
+router.get('/google', passport.authenticate('google', { scope: ['email', 'profile'] }))
+
+router.get('/google/callback',
+    passport.authenticate('google', { session: false, failureRedirect: '/login' }),
+    async (req, res) => {
+        try {
+            const token = jwt.sign(
+                { userId: req.user._id },
+                process.env.JWT_SECRET,
+                { expiresIn: '7d' }
+            )
+
+            const frontendURL = process.env.NODE_ENV === 'production'
+                ? 'https://nudget-delta.vercel.app'
+                : 'http://localhost:5173'
+
+            res.redirect(`${frontendURL}/auth/callback?token=${token}&userId=${req.user._id}`)
+        } catch (err) {
+            res.status(500).json({ message: 'Server error', error: err.message })
+        }
+    }
+)
 
 export default router;
