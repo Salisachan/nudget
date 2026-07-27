@@ -7,6 +7,7 @@ import Chat from './pages/Chat'
 import Dashboard from './pages/Dashboard'
 import Transactions from './pages/Transactions'
 import EditTransaction from './pages/EditTransaction'
+import AuthCallback from './pages/AuthCallback'
 
 const ProtectedRoute = ({ children }) => {
   const { token } = useAuth()
@@ -40,6 +41,7 @@ function App() {
             <EditTransaction />
           </ProtectedRoute>
         } />
+        <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>
   )

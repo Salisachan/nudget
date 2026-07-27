@@ -19,7 +19,7 @@ router.post('/parse', auth, async (req, res) => {
 
         // Step 1 — classify input as transaction or question
         const classifyCompletion = await groq.chat.completions.create({
-            model: 'llama-3.3-70b-versatile',
+            model: 'openai/gpt-oss-120b',
             messages: [
                 {
                     role: 'system',
@@ -46,7 +46,7 @@ router.post('/parse', auth, async (req, res) => {
             const yesterday = new Date(now - 86400000).toLocaleDateString('en-CA', { timeZone: 'UTC' })
 
             const parseCompletion = await groq.chat.completions.create({
-                model: 'meta-llama/llama-4-maverick-17b-128e-instruct',
+                model: 'openai/gpt-oss-120b',
                 messages: [
                     {
                         role: 'system',
@@ -109,7 +109,7 @@ router.post('/parse', auth, async (req, res) => {
         }
 
         const answerCompletion = await groq.chat.completions.create({
-            model: 'llama-3.3-70b-versatile',
+            model: 'openai/gpt-oss-120b',
             messages: [
                 {
                     role: 'system',
